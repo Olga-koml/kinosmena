@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'projects.apps.ProjectsConfig',
+    'shifts.apps.ShiftsConfig',
 ]
 
 MIDDLEWARE = [

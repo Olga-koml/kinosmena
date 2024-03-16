@@ -1,7 +1,8 @@
 from django.db import models
 from django.conf import settings
 from .validators import ShiftDuratinonValidator, validate_rate
-from django.contrib.auth.models import User  # исправить потом на кастомного юзера
+# TODO  исправить потом на кастомного юзера
+from django.contrib.auth.models import User
 
 
 class Project(models.Model):
