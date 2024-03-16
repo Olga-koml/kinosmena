@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ital(1(gpoy7*7%781ysi*go&pj)+(y0#a+9hyi9+=28lk3wl@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -127,9 +127,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        'rest_framework.permissions.AllowAny'
     ]
 }
+
+# SESSION_COOKIE_SECURE = True
+# CORS_ALLOW_ALL_ORIGINS = True
+CSRF_TRUSTED_ORIGINS = ['http://*', 'https://*']
 
 MAX_LEN_NAME = 20
 MAX_LEN_DESCRIPTION = 50
