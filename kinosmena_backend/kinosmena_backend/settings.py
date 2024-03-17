@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'drf_yasg',
     'projects.apps.ProjectsConfig',
     'shifts.apps.ShiftsConfig',
 ]
@@ -135,6 +136,29 @@ REST_FRAMEWORK = {
 # CORS_ALLOW_ALL_ORIGINS = True
 CSRF_TRUSTED_ORIGINS = ['http://*', 'https://*']
 
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Token': {  # авторизация в джанго по токену
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'Use your token in the following format: <strong>Token <em>&lt;your-token&gt;</em></strong> ',
+        },
+
+        # 'Basic': {'type': 'basic'},  # базова авторизация
+    },
+    'USE_SESSION_AUTH': True,  # кнопка джанго логин можно отключить поменяв False
+    'JSON_EDITOR': True,
+    'SHOW_REQUEST_HEADERS': True,
+    'DEFAULT_MODEL_RENDERING': 'model',  # Отображение моделей (model, example)
+    # Глубина отображения моделей (-1 - без ограничений)
+    'DEFAULT_MODEL_DEPTH': 2,
+    'DOC_EXPANSION': 'list',  # full, none
+    'OPERATIONS_SORTER': 'alpha',  # Сортировка операций (alpha, method)
+    'TAGS_SORTER': 'alpha',  # Сортировка тегов (alpha, order)
+}
+
+# Constants
 MAX_LEN_NAME = 20
 MAX_LEN_DESCRIPTION = 50
 MAX_VAL_SHIFT_DURATION = 24
