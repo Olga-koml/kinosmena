@@ -1,9 +1,10 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 
-
-# TODO  исправить потом на кастомного юзера
-from django.contrib.auth.models import User
 from projects.models import Project
+
+
+User = get_user_model()
 
 
 class Shift(models.Model):
