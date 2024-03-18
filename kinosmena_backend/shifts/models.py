@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 
 from projects.models import Project
-
+from users.models import TelegramUser
 
 User = get_user_model()
 
@@ -15,7 +15,7 @@ class Shift(models.Model):
         DRAFT = 'DF', 'Draft'
 
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE,
+        TelegramUser, on_delete=models.CASCADE,
         related_name='shifts'
         )
 
