@@ -8,6 +8,7 @@ class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
         fields = [
+            'id',
             'project',
             'user',
             'start_date',
@@ -31,3 +32,9 @@ class ReportSerializer(serializers.ModelSerializer):
             'non_sleep_rate',
             'total'
         ]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation[
+            'project'] = instance.project.name if instance.project else None
+        return representation
