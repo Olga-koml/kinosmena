@@ -12,3 +12,7 @@ class ShiftViewSet(ModelViewSet):
     """
     queryset = Shift.objects.all()
     serializer_class = ShiftSerializer
+
+    def get(self, request):
+        telegram_id = request.GET.get('id')
+        print(telegram_id)
