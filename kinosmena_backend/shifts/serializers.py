@@ -4,9 +4,6 @@ from shifts.models import Shift
 
 
 class ShiftSerializer(serializers.ModelSerializer):
-    # user = serializers.CharField(read_only=True)
-    start_date = serializers.DateTimeField(read_only=True)
-    end_date = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = Shift

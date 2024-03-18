@@ -63,9 +63,9 @@ class Shift(models.Model):
         verbose_name='Статус'
     )
 
-    class Meta:
-        verbose_name = 'Смена'
-        verbose_name_plural = 'Смены'
-
     def __str__(self):
         return self.project.name
+
+    class Meta:
+        verbose_name = 'смена'
+        verbose_name_plural = 'смены'

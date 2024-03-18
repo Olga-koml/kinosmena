@@ -10,3 +10,7 @@ class TelegramUser(models.Model):
 
     def __str__(self):
         return f'{self.tid}'
+
+    class Meta:
+        verbose_name = 'пользователь'
+        verbose_name_plural = 'пользователи'

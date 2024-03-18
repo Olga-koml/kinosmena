@@ -1,8 +1,8 @@
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from shifts.models import Shift
-from shifts.serializers import ShiftSerializer
+from reports.models import Report
+from reports.serializers import ReportSerializer
 from users.models import TelegramUser
 
 
@@ -15,17 +15,20 @@ def get_user_tid(request):
     return user
 
 
-class ShiftViewSet(ModelViewSet):
+class ReportViewSet(ModelViewSet):
     """
     Представление для смен.
 
     Позволяет получать, создавать, редактировать, удалять смену.
     """
-    serializer_class = ShiftSerializer
+    serializer_class = ReportSerializer
 
     def get_queryset(self):
         user: TelegramUser = get_user_tid(request=self.request)
-        queryset = Shift.objects.filter(user__tid=user.tid)
+        queryset = Report.objects.filter(
+            end_date__isnull=False,
+            user__tid=user.tid
+        )
 
         return queryset
 
