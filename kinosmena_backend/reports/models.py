@@ -1,3 +1,4 @@
+from django.utils.timezone import now
 from django.db import models
 
 from projects.models import Project
@@ -17,8 +18,7 @@ class Report(models.Model):
         verbose_name='Пользователь'
     )
     start_date = models.DateTimeField(
-        null=True,
-        blank=True,
+        default=now,
         verbose_name='Начало смены',
     )
 
@@ -28,7 +28,8 @@ class Report(models.Model):
         verbose_name='Конец смены',
     )
     shift_rate = models.IntegerField(
-        verbose_name='цена за смену'
+        verbose_name='цена за смену',
+        default=0
     )
     overwork_hours = models.PositiveSmallIntegerField(
         default=0,
@@ -62,6 +63,18 @@ class Report(models.Model):
     )
     late_lunch = models.PositiveIntegerField(
         verbose_name='поздний обед',
+        default=0
+    )
+    day_off = models.PositiveIntegerField(
+        verbose_name='Day-off',
+        default=0
+    )
+    is_per_diem = models.BooleanField(
+        verbose_name='Суточные',
+        default=False
+    )
+    per_diem = models.IntegerField(
+        verbose_name='Суточные',
         default=0
     )
     total = models.PositiveIntegerField(

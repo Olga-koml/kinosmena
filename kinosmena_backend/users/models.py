@@ -4,6 +4,7 @@ from django.db import models
 class TelegramUser(models.Model):
 
     tid = models.PositiveBigIntegerField(
+        primary_key=True,
         unique=True,
         verbose_name='Telegram ID',
     )

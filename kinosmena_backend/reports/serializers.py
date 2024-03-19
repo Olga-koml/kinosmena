@@ -19,7 +19,11 @@ class ReportSerializer(serializers.ModelSerializer):
             'non_sleep_hours',
             'non_sleep_rate',
             'is_current_lunch',
+            'current_lunch',
             'is_late_lunch',
+            'late_lunch',
+            'is_per_diem',
+            'per_diem',
             'total',
         ]
         read_only_fields = [
@@ -28,9 +32,12 @@ class ReportSerializer(serializers.ModelSerializer):
             'shift_rate',
             'overwork_hours',
             'overwork_rate',
+            'current_lunch',
+            'late_lunch',
             'non_sleep_hours',
             'non_sleep_rate',
-            'total'
+            'per_diem',
+            'total',
         ]
 
     def to_representation(self, instance):
