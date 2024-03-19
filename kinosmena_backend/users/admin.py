@@ -26,3 +26,14 @@ class ReportAdmin(admin.ModelAdmin):
         'non_sleep_rate',
         'total',
     ]
+
+
+from .models import TelegramUser
+
+
+@admin.register(TelegramUser)
+class UserAdmin(admin.ModelAdmin):
+
+    list_display = ('id', 'tid')
+    
+
