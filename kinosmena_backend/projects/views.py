@@ -1,9 +1,13 @@
 from django.shortcuts import render
 
 from rest_framework import viewsets
-from .serializers import ProjectSerializer
+from projects.serializers import ProjectSerializer
 from projects.models import Project
 from users.models import TelegramUser
+from django_filters.rest_framework import DjangoFilterBackend
+# from .filters import ProjectFilter
+from api import schemas
+from drf_yasg.utils import swagger_auto_schema
 
 
 def get_user_tid(request):
@@ -23,6 +27,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    filter_backends = (DjangoFilterBackend, )
+    filterset_fields = ['is_archive',]
+    # filterset_class = ProjectFilter
 
     def get_queryset(self):
         user: TelegramUser = get_user_tid(request=self.request)
@@ -37,3 +44,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     # def perform_create(self, serializer):
     #     serializer.save(user=self.request.user)
+
+    @swagger_auto_schema(
+        manual_parameters=schemas.archive_project_filter_param
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
