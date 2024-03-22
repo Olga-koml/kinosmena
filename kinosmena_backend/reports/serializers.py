@@ -38,6 +38,7 @@ class ReportSerializer(serializers.ModelSerializer):
             'non_sleep_rate',
             'per_diem',
             'total',
+            'user'
         ]
 
     def to_representation(self, instance):
