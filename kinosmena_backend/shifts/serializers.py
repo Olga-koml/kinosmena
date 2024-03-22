@@ -8,13 +8,41 @@ class ShiftSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shift
         fields = [
-            'user',
+            'id',
             'project',
+            'user',
             'start_date',
             'end_date',
-            'created',
+            'shift_rate',
+            'overwork_hours',
+            'overwork_rate',
+            'non_sleep_hours',
+            'non_sleep_rate',
             'is_current_lunch',
+            'current_lunch',
             'is_late_lunch',
-            'is_day_off',
-            'status',
+            'late_lunch',
+            'is_per_diem',
+            'per_diem',
+            'total',
         ]
+        read_only_fields = [
+            'late_lunch',
+            'current_lunch',
+            'shift_rate',
+            'overwork_hours',
+            'overwork_rate',
+            'current_lunch',
+            'late_lunch',
+            'non_sleep_hours',
+            'non_sleep_rate',
+            'per_diem',
+            'total',
+            'user'
+        ]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation[
+            'project'] = instance.project.name if instance.project else None
+        return representation

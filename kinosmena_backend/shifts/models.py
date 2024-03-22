@@ -1,32 +1,24 @@
+from django.utils.timezone import now
 from django.db import models
-from django.contrib.auth import get_user_model
 
 from projects.models import Project
 from users.models import TelegramUser
 
-User = get_user_model()
-
 
 class Shift(models.Model):
-
-    class Status(models.TextChoices):
-        STARTED = 'ST', 'Started'
-        FINISHED = 'F', 'Finished'
-        DRAFT = 'DF', 'Draft'
-
-    user = models.ForeignKey(
-        TelegramUser, on_delete=models.CASCADE,
-        related_name='shifts'
-        )
-
     project = models.ForeignKey(
-        Project, on_delete=models.CASCADE,
+        to=Project,
+        on_delete=models.CASCADE,
+        verbose_name='проект',
         related_name='shifts'
     )
-
+    user = models.ForeignKey(
+        TelegramUser, on_delete=models.CASCADE,
+        related_name='shifts',
+        verbose_name='Пользователь'
+    )
     start_date = models.DateTimeField(
-        null=True,
-        blank=True,
+        default=now,
         verbose_name='Начало смены',
     )
 
@@ -35,37 +27,65 @@ class Shift(models.Model):
         blank=True,
         verbose_name='Конец смены',
     )
-
-    created = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Дата создания'
+    shift_rate = models.IntegerField(
+        verbose_name='цена за смену',
+        default=0
     )
-
+    overwork_hours = models.PositiveSmallIntegerField(
+        default=0,
+        null=False,
+        verbose_name='часы переработки'
+    )
+    overwork_rate = models.PositiveIntegerField(
+        verbose_name='сумма переработок',
+        default=0
+    )
+    non_sleep_hours = models.PositiveSmallIntegerField(
+        default=0,
+        null=False,
+        verbose_name='часы недосыпа'
+    )
+    non_sleep_rate = models.PositiveIntegerField(
+        verbose_name='сумма недосыпов',
+        default=0
+    )
     is_current_lunch = models.BooleanField(
         default=False,
         verbose_name='текущий обед'
     )
-
+    current_lunch = models.PositiveIntegerField(
+        verbose_name='текущий обед',
+        default=0
+    )
     is_late_lunch = models.BooleanField(
         default=False,
         verbose_name='поздний обед'
     )
-
-    is_day_off = models.BooleanField(
-        default=False,
-        verbose_name='day-off'
+    late_lunch = models.PositiveIntegerField(
+        verbose_name='поздний обед',
+        default=0
     )
-
-    status = models.CharField(
-        max_length=2,
-        choices=Status.choices,
-        default=Status.DRAFT,
-        verbose_name='Статус'
+    day_off = models.PositiveIntegerField(
+        verbose_name='Day-off',
+        default=0
+    )
+    is_per_diem = models.BooleanField(
+        verbose_name='Суточные',
+        default=False
+    )
+    per_diem = models.IntegerField(
+        verbose_name='Суточные',
+        default=0
+    )
+    total = models.PositiveIntegerField(
+        verbose_name='итого',
+        default=0
     )
 
     def __str__(self):
-        return self.project.name
+        return f'{self.user} | {self.project} | {self.start_date}'
 
     class Meta:
-        verbose_name = 'смена'
-        verbose_name_plural = 'смены'
+        ordering = ['-id']
+        verbose_name = 'отчет'
+        verbose_name_plural = 'отчеты'

@@ -1,18 +1,12 @@
-from rest_framework.response import Response
+from django_filters import rest_framework as filters
 from rest_framework.viewsets import ModelViewSet
 
+from projects.models import Project
+from shifts.filters import ShiftFilter
 from shifts.models import Shift
+from shifts.permissions import IsProjectOwner
 from shifts.serializers import ShiftSerializer
 from users.models import TelegramUser
-
-
-def get_user_tid(request):
-    tid = request.GET.get('tid')
-    user, create = TelegramUser.objects.get_or_create(
-        tid=tid
-    )
-
-    return user
 
 
 class ShiftViewSet(ModelViewSet):
@@ -22,13 +16,35 @@ class ShiftViewSet(ModelViewSet):
     Позволяет получать, создавать, редактировать, удалять смену.
     """
     serializer_class = ShiftSerializer
+    filterset_class = ShiftFilter
+    filter_backends = (filters.DjangoFilterBackend, )
+    permission_classes = [IsProjectOwner]
+    filterset_fields = [
+        'project',
+        'user',
+        'start_date_from',
+        'start_date_to',
+    ]
 
     def get_queryset(self):
-        user: TelegramUser = get_user_tid(request=self.request)
-        queryset = Shift.objects.filter(user__tid=user.tid)
+        user, created = TelegramUser.objects.get_or_create(
+            tid=self.request.GET.get('tid')
+        )
+        return user.shifts.all()
 
-        return queryset
-
-    def list(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
-        return Response(serializer.data)
+    def perform_create(self, serializer):
+        user, created = TelegramUser.objects.get_or_create(
+            tid=self.request.GET.get('tid')
+        )
+        project = Project.objects.get(
+            id=self.request.data.get('project')
+        )
+        active_shifts = Shift.objects.filter(
+            user=user,
+            end_date__isnull=True,
+            project=project
+        )
+        if active_shifts:
+            raise ValueError(f'Незавершенная смена: {active_shifts[0].id}')
+        serializer.validated_data['user'] = user
+        serializer.save()

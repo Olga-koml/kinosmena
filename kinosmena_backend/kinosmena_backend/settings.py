@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'django_filters',
-    'reports.apps.ReportsConfig',
     'users.apps.UsersConfig',
     'projects.apps.ProjectsConfig',
     'shifts.apps.ShiftsConfig',
