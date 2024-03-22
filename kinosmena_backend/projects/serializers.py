@@ -2,10 +2,13 @@ from rest_framework import serializers
 
 from projects.models import Project
 
-from .validators import validate_dates
+from api.validators import validate_dates
+from shifts.serializers import ShiftShortSerializer
 
 
 class ProjectSerializer(serializers.ModelSerializer):
+    shifts = ShiftShortSerializer(many=True, read_only=True)
+
     class Meta:
         model = Project
         fields = (
@@ -26,8 +29,9 @@ class ProjectSerializer(serializers.ModelSerializer):
             'is_archive',
             'created',
             'user',
+            'shifts',
             )
-        read_only_fields = ('user',)
+        read_only_fields = ('user', 'shifts',)
 
     def validate(self, data):
         start_date = data.get('start_date')

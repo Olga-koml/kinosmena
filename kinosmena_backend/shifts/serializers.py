@@ -46,3 +46,22 @@ class ShiftSerializer(serializers.ModelSerializer):
         representation[
             'project'] = instance.project.name if instance.project else None
         return representation
+
+
+class ShiftShortSerializer(serializers.ModelSerializer):
+    is_closed = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Shift
+        fields = (
+            'id',
+            'start_date',
+            'end_date',
+            'is_closed',
+            )
+
+    def get_is_closed(self, obj):
+        if obj.end_date is None:
+            return False
+        else:
+            return True
