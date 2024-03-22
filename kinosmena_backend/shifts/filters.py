@@ -4,13 +4,17 @@ from shifts.models import Shift
 
 
 class ShiftFilter(filters.FilterSet):
-    tid = filters.CharFilter(field_name='user', method='filter_user')
     start_date_from = filters.DateFilter(field_name='start_date', lookup_expr='gte')
     start_date_to = filters.DateFilter(field_name='start_date', lookup_expr='lte')
+    is_active = filters.BooleanFilter(method='get_is_active')
 
-    def filter_user(self, queryset, name, value):
-        return queryset.filter(user=value)
+    def get_is_active(self, queryset, name, value):
+        if value:
+            queryset = queryset.filter(end_date=None)
+        elif not value:
+            queryset = queryset.filter(end_date__isnull=False)
+        return queryset
 
     class Meta:
         model = Shift
-        fields = ['project', 'start_date_from', 'start_date_to']
+        fields = ['project', 'start_date_from', 'start_date_to', 'is_active']

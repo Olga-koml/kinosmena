@@ -1,5 +1,6 @@
-from django.utils.timezone import now
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.utils.timezone import now
 
 from projects.models import Project
 from users.models import TelegramUser
@@ -21,12 +22,32 @@ class Shift(models.Model):
         default=now,
         verbose_name='Начало смены',
     )
-
     end_date = models.DateTimeField(
         null=True,
         blank=True,
         verbose_name='Конец смены',
     )
+    is_current_lunch = models.BooleanField(
+        default=False,
+        verbose_name='текущий обед'
+    )
+    is_late_lunch = models.BooleanField(
+        default=False,
+        verbose_name='поздний обед'
+    )
+    is_per_diem = models.BooleanField(
+        verbose_name='Суточные',
+        default=False
+    )
+    is_day_off = models.BooleanField(
+        verbose_name='смена в day-off',
+        default=False
+    )
+    services = models.IntegerField(
+        verbose_name='Дополнительные услуги',
+        default=0
+    )
+
     shift_rate = models.IntegerField(
         verbose_name='цена за смену',
         default=0
@@ -49,17 +70,9 @@ class Shift(models.Model):
         verbose_name='сумма недосыпов',
         default=0
     )
-    is_current_lunch = models.BooleanField(
-        default=False,
-        verbose_name='текущий обед'
-    )
     current_lunch = models.PositiveIntegerField(
         verbose_name='текущий обед',
         default=0
-    )
-    is_late_lunch = models.BooleanField(
-        default=False,
-        verbose_name='поздний обед'
     )
     late_lunch = models.PositiveIntegerField(
         verbose_name='поздний обед',
@@ -68,10 +81,6 @@ class Shift(models.Model):
     day_off = models.PositiveIntegerField(
         verbose_name='Day-off',
         default=0
-    )
-    is_per_diem = models.BooleanField(
-        verbose_name='Суточные',
-        default=False
     )
     per_diem = models.IntegerField(
         verbose_name='Суточные',
@@ -87,5 +96,5 @@ class Shift(models.Model):
 
     class Meta:
         ordering = ['-id']
-        verbose_name = 'отчет'
-        verbose_name_plural = 'отчеты'
+        verbose_name = 'смена'
+        verbose_name_plural = 'смены'
