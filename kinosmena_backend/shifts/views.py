@@ -1,5 +1,6 @@
 from django_filters import rest_framework as filters
 from rest_framework.viewsets import ModelViewSet
+from rest_framework import serializers
 
 from projects.models import Project
 from shifts.filters import ShiftFilter
@@ -7,6 +8,9 @@ from shifts.models import Shift
 from shifts.permissions import IsProjectOwner
 from shifts.serializers import ShiftSerializer
 from users.models import TelegramUser
+from shifts.config import load_config
+
+config = load_config()
 
 
 class ShiftViewSet(ModelViewSet):
@@ -19,12 +23,6 @@ class ShiftViewSet(ModelViewSet):
     filterset_class = ShiftFilter
     filter_backends = (filters.DjangoFilterBackend, )
     permission_classes = [IsProjectOwner]
-    filterset_fields = [
-        'project',
-        'user',
-        'start_date_from',
-        'start_date_to',
-    ]
 
     def get_queryset(self):
         user, created = TelegramUser.objects.get_or_create(
@@ -45,6 +43,6 @@ class ShiftViewSet(ModelViewSet):
             project=project
         )
         if active_shifts:
-            raise ValueError(f'Незавершенная смена: {active_shifts[0].id}')
+            raise serializers.ValidationError({'details': f'{config.active_shift_error}, shift_id: {active_shifts[0].id}'})
         serializer.validated_data['user'] = user
         serializer.save()
