@@ -90,7 +90,7 @@ class ShiftSerializer(serializers.ModelSerializer):
 
 
 class ShiftShortSerializer(serializers.ModelSerializer):
-    is_closed = serializers.SerializerMethodField(read_only=True)
+    is_active = serializers.SerializerMethodField(read_only=True,)
 
     class Meta:
         model = Shift
@@ -98,11 +98,11 @@ class ShiftShortSerializer(serializers.ModelSerializer):
             'id',
             'start_date',
             'end_date',
-            'is_closed',
+            'is_active',
             )
 
-    def get_is_closed(self, obj):
+    def get_is_active(self, obj):
         if obj.end_date is None:
-            return False
-        else:
             return True
+        else:
+            return False
