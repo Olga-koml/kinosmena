@@ -9,6 +9,8 @@ from shifts.permissions import IsProjectOwner
 from shifts.serializers import ShiftSerializer
 from users.models import TelegramUser
 from shifts.config import load_config
+from api import schemas
+from drf_yasg.utils import swagger_auto_schema
 
 config = load_config()
 
@@ -46,3 +48,9 @@ class ShiftViewSet(ModelViewSet):
             raise serializers.ValidationError({'details': f'{config.active_shift_error}, shift_id: {active_shifts[0].id}'})
         serializer.validated_data['user'] = user
         serializer.save()
+
+    @swagger_auto_schema(
+        manual_parameters=schemas.shifts_filter_params
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
