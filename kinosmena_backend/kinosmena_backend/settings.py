@@ -27,7 +27,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
+CSRF_TRUSTED_ORIGINS = [
+    'https://*rbychin.ddns.net/',
+    'https://*.127.0.0.1',
+    'http://*rbychin.ddns.net/',
+    'http://*.127.0.0.1',
+]
 # Application definition
 
 INSTALLED_APPS = [
