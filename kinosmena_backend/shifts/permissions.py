@@ -11,7 +11,7 @@ class IsProjectOwner(BasePermission):
     """
 
     def has_permission(self, request, view):
-        if 'tid' in request.GET and request.method == 'POST':
+        if 'tid' in request.GET and request.method == 'POST' and request.data.get('project'):
             user_id = request.GET.get('tid')
             user = TelegramUser.objects.get(tid=user_id)
             project = Project.objects.get(id=request.data.get('project'))
