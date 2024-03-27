@@ -15,14 +15,12 @@ class UpdateData:
 class ShiftManager:
     def __init__(self, obj: Shift):
         self.obj = obj
-        # self.data = data  # Добавляем передаваемые данные
 
     def update(self, data: dict):
         update_data = UpdateData(**data)
         print("Update data:", update_data.__dict__)
 
         shift_sum = self.calculate_shift_sum()
-        print("Shift sum:", shift_sum)
         overwork_hours = self.get_overwork_hours(update_data)
         overwork_sum = self.calculate_overwork_sum(overwork_hours)
         current_lunch_sum = self.calculate_current_lunch_sum(update_data)
@@ -66,11 +64,11 @@ class ShiftManager:
         return data.services_sum
 
     def get_overwork_hours(self, data):
-        if data.project:
-            shift_duration = timedelta(hours=self.obj.project.shift_duration)
-            return math.ceil(
-                ((data.end_date - data.start_date - shift_duration).total_seconds() / 3600)
-            ) if data.start_date + shift_duration < data.end_date else 0
+        # if data.project:
+        shift_duration = timedelta(hours=self.obj.project.shift_duration)
+        return math.ceil(
+            ((data.end_date - data.start_date - shift_duration).total_seconds() / 3600)
+        ) if data.start_date + shift_duration < data.end_date else 0
 
     def calculate_overwork_sum(self, overtime_hours):
         return self.obj.project.overtime_rate * overtime_hours
