@@ -15,14 +15,16 @@ class ShiftAdmin(admin.ModelAdmin):
         'project__name'
     ]
     readonly_fields = [
-        'shift_rate',
+        'shift_sum',
         'overwork_hours',
-        'overwork_rate',
+        'overwork_sum',
         'is_late_lunch',
-        'late_lunch',
+        'late_lunch_sum',
         'is_current_lunch',
-        'current_lunch',
+        'current_lunch_sum',
         'non_sleep_hours',
-        'non_sleep_rate',
+        'non_sleep_sum',
+        'day_off_hours',
+        'day_off_sum',
         'total',
     ]

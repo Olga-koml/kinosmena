@@ -43,4 +43,5 @@ class ProjectSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         instance = super().create(validated_data)
         instance.full_clean()
+        instance.save()
         return instance

@@ -1,0 +1,160 @@
+import math
+from datetime import timedelta
+
+from shifts.models import Shift
+
+DAY_OFF_HOURS = 36
+
+
+class UpdateData:
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+
+class ShiftManager:
+    def __init__(self, obj: Shift):
+        self.obj = obj
+
+    # def update(self, data: dict):
+    #     update_data = UpdateData(**data)
+    #     # self._get_overwork(update_data)
+
+    def update(self, data: dict):
+        update_data = UpdateData(**data)
+        print("Update data:", update_data.__dict__)  
+
+        shift_sum = self.calculate_shift_sum()
+        print("Shift sum:", shift_sum) 
+        overwork_hours = self.get_overwork_hours(update_data)
+        overwork_sum = self.calculate_overwork_sum(overwork_hours)
+        current_lunch_sum = self.calculate_current_lunch_sum()
+        late_lunch_sum = self.calculate_late_lunch_sum()
+        print('late_lunch_sum',  late_lunch_sum)
+        per_diem_sum = self.calculate_per_diem_sum()
+        non_sleep_hours = self.get_non_sleep_hours(update_data)
+        non_sleep_sum = self.calculate_non_sleep_sum(non_sleep_hours)
+        day_off_hours = self.get_day_off_hours(update_data)
+        day_off_sum = self.calculate_day_off_sum(day_off_hours)
+        total = self.calculate_total(
+            shift_sum,
+            overwork_sum,
+            current_lunch_sum,
+            late_lunch_sum,
+            per_diem_sum,
+            day_off_sum,
+            non_sleep_sum
+        )
+
+        # Обновление данных объекта Shift
+        self.obj.shift_sum = shift_sum
+        self.obj.overwork_hours = overwork_hours
+        self.obj.overwork_sum = overwork_sum
+        self.obj.current_lunch_sum = current_lunch_sum
+        self.obj.late_lunch_sum = late_lunch_sum
+        self.obj.per_diem_sum = per_diem_sum
+        self.obj.non_sleep_hours = non_sleep_hours
+        self.obj.non_sleep_sum = non_sleep_sum
+        self.obj.day_off_hours = day_off_hours
+        self.obj.day_off_sum = day_off_sum
+        self.obj.total = total
+
+        self.obj.save()
+
+    def calculate_shift_sum(self):
+        return self.obj.project.shift_rate
+
+    # def calculate_overwork_hours(self, start_date, end_date):
+    #     shift_duration = timedelta(hours=self.project.shift_duration)
+    #     overtime_hours = math.ceil(((end_date - start_date - shift_duration).total_seconds() / 3600)) if start_date + shift_duration < end_date else 0
+    #     return overtime_hours
+
+    def get_overwork_hours(self, data):
+        if data.project:
+            shift_duration = timedelta(hours=self.obj.project.shift_duration)
+            return math.ceil(
+                ((data.end_date - self.obj.start_date - shift_duration).total_seconds() / 3600)
+            ) if self.obj.start_date + shift_duration < data.end_date else 0
+            # data.overwork_rate = data.project.overtime_rate * data.overwork_hours
+
+    def calculate_overwork_sum(self, overtime_hours):
+        return self.obj.project.overtime_rate * overtime_hours
+
+    def calculate_current_lunch_sum(self):
+        return (
+            self.obj.project.current_lunch_rate
+            if self.obj.is_current_lunch
+            else 0
+        )
+
+    def calculate_late_lunch_sum(self):
+        return (
+            self.obj.project.late_lunch_rate
+            if self.obj.is_late_lunch
+            else 0
+        )
+
+    def calculate_per_diem_sum(self):
+        return self.obj.project.per_diem if self.obj.is_per_diem else 0
+
+    def get_non_rest_hours(self, rest_hours):
+        previous_shift = Shift.objects.filter(
+            project=self.obj.project, end_date__lt=self.obj.start_date
+        ).order_by('-end_date').first()
+        print(previous_shift, "PREVIOUS SHIFT")
+        if previous_shift:
+            prev_shift_end_date = previous_shift.end_date
+            print(prev_shift_end_date, 'PREV_SHIFT_END_DATE')
+            prev_shift_start_date = previous_shift.start_date
+            prev_fact_shift_duration = math.ceil(
+                (prev_shift_end_date - prev_shift_start_date
+                 ).total_seconds() / 3600)
+            shift_duration = timedelta(hours=self.obj.project.shift_duration)
+            print(shift_duration, 'SHIFT DURATION')
+            prev_date_start_non_sleep = (
+                prev_shift_start_date + timedelta(hours=prev_fact_shift_duration)
+                if prev_fact_shift_duration > self.obj.project.shift_duration
+                else prev_shift_start_date + shift_duration
+            )
+            print(prev_date_start_non_sleep, "DATE_START_NON_SLEEP")
+            rest_duration = timedelta(hours=rest_hours)  # self.obj.project.rest_duration
+            print(rest_duration, "REST DURATION")
+            print(self.obj.start_date, 'НАЧАЛО ТЕКУЩЕЙ ДАТЫ')
+            non_sleep_hours = (
+                math.ceil((
+                    prev_date_start_non_sleep + rest_duration - self.obj.start_date
+                ).total_seconds() / 3600)
+                if prev_date_start_non_sleep + rest_duration > self.obj.start_date
+                else 0)
+            print(non_sleep_hours, 'NON SLEEP HOURS')
+            return non_sleep_hours
+        return 0
+
+    def get_non_sleep_hours(self, data):
+        if not self.obj.is_day_off:
+            non_sleep_hours = self.get_non_rest_hours(
+                self.obj.project.rest_duration
+            )
+            return non_sleep_hours
+        return 0
+
+    def calculate_non_sleep_sum(self, non_sleep_hours):
+        return non_sleep_hours * self.obj.project.non_sleep_rate
+
+    def get_day_off_hours(self, data):
+        if self.obj.is_day_off:
+            day_off_hours = self.get_non_rest_hours(DAY_OFF_HOURS)
+            return day_off_hours
+        return 0
+
+    def calculate_day_off_sum(self, day_off_hours):
+        return self.obj.project.day_off_rate * day_off_hours
+
+    def calculate_total(
+            self, shift_sum, overwork_sum, current_lunch_sum,
+            late_lunch_sum, per_diem_sum, day_off_sum, non_sleep_sum
+            ):
+        return (
+            shift_sum + overwork_sum + current_lunch_sum +
+            late_lunch_sum + per_diem_sum + day_off_sum + non_sleep_sum
+        )

@@ -24,7 +24,7 @@ class ShiftViewSet(ModelViewSet):
     serializer_class = ShiftSerializer
     filterset_class = ShiftFilter
     filter_backends = (filters.DjangoFilterBackend, )
-    permission_classes = [IsProjectOwner]
+    # permission_classes = [IsProjectOwner]
 
     def get_queryset(self):
         user, created = TelegramUser.objects.get_or_create(
