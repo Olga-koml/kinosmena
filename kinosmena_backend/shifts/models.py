@@ -43,12 +43,12 @@ class Shift(models.Model):
         verbose_name='смена в day-off',
         default=False
     )
-    services = models.IntegerField(
+    services_sum = models.IntegerField(
         verbose_name='Дополнительные услуги',
         default=0
     )
 
-    shift_rate = models.IntegerField(
+    shift_sum = models.IntegerField(
         verbose_name='цена за смену',
         default=0
     )
@@ -57,7 +57,7 @@ class Shift(models.Model):
         null=False,
         verbose_name='часы переработки'
     )
-    overwork_rate = models.PositiveIntegerField(
+    overwork_sum = models.PositiveIntegerField(
         verbose_name='сумма переработок',
         default=0
     )
@@ -66,23 +66,28 @@ class Shift(models.Model):
         null=False,
         verbose_name='часы недосыпа'
     )
-    non_sleep_rate = models.PositiveIntegerField(
+    non_sleep_sum = models.PositiveIntegerField(
         verbose_name='сумма недосыпов',
         default=0
     )
-    current_lunch = models.PositiveIntegerField(
+    current_lunch_sum = models.PositiveIntegerField(
         verbose_name='текущий обед',
         default=0
     )
-    late_lunch = models.PositiveIntegerField(
+    late_lunch_sum = models.PositiveIntegerField(
         verbose_name='поздний обед',
         default=0
     )
-    day_off = models.PositiveIntegerField(
-        verbose_name='Day-off',
+    day_off_sum = models.PositiveIntegerField(
+        verbose_name='сумма в Day-off',
         default=0
     )
-    per_diem = models.IntegerField(
+    day_off_hours = models.PositiveSmallIntegerField(
+        default=0,
+        null=False,
+        verbose_name='часы переработки в day-off'
+    )
+    per_diem_sum = models.IntegerField(
         verbose_name='Суточные',
         default=0
     )

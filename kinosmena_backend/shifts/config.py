@@ -36,4 +36,3 @@ def load_config() -> ShiftConfig:
         lunch=LunchField(),
         datefield=DateField()
     )
-
