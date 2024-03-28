@@ -7,9 +7,13 @@ DAY_OFF_HOURS = 36
 
 
 class UpdateData:
-    def __init__(self, **kwargs):
-        for key, value in kwargs.items():
+    def __init__(self, obj, **kwargs):
+        for key, value in obj.__dict__.items():
             setattr(self, key, value)
+
+        for key, value in kwargs.items():
+            if hasattr(obj, key):
+                setattr(self, key, value)
 
 
 class ShiftManager:
@@ -17,21 +21,21 @@ class ShiftManager:
         self.obj = obj
 
     def update(self, data: dict):
-        update_data = UpdateData(**data)
-        print("Update data:", update_data.__dict__)
+        update_data: UpdateData = UpdateData(self.obj, **data)
+        print(self._get_overwork_hours(update_data))
 
-        shift_sum = self.calculate_shift_sum()
-        overwork_hours = self.get_overwork_hours(update_data)
-        overwork_sum = self.calculate_overwork_sum(overwork_hours)
-        current_lunch_sum = self.calculate_current_lunch_sum(update_data)
-        late_lunch_sum = self.calculate_late_lunch_sum(update_data)
-        per_diem_sum = self.calculate_per_diem_sum(update_data)
-        non_sleep_hours = self.get_non_sleep_hours(update_data)
-        non_sleep_sum = self.calculate_non_sleep_sum(non_sleep_hours)
+        shift_sum = self._calculate_shift_sum()
+        overwork_hours = self._get_overwork_hours(update_data)
+        overwork_sum = self._calculate_overwork_sum(overwork_hours)
+        current_lunch_sum = self._calculate_current_lunch_sum(update_data)
+        late_lunch_sum = self._calculate_late_lunch_sum(update_data)
+        per_diem_sum = self._calculate_per_diem_sum(update_data)
+        non_sleep_hours = self._get_non_sleep_hours(update_data)
+        non_sleep_sum = self._calculate_non_sleep_sum(non_sleep_hours)
         day_off_hours = self.get_day_off_hours(update_data)
-        day_off_sum = self.calculate_day_off_sum(day_off_hours)
-        services_sum = self.calculate_services_sum(update_data)
-        total = self.calculate_total(
+        day_off_sum = self._calculate_day_off_sum(day_off_hours)
+        services_sum = self._calculate_services_sum(update_data)
+        total = self._calculate_total(
             shift_sum,
             overwork_sum,
             current_lunch_sum,
@@ -57,40 +61,40 @@ class ShiftManager:
 
         self.obj.save()
 
-    def calculate_shift_sum(self):
+
+    def _calculate_shift_sum(self):
         return self.obj.project.shift_rate
 
-    def calculate_services_sum(self, data):
+    def _calculate_services_sum(self, data):
         return data.services_sum
 
-    def get_overwork_hours(self, data):
-        # if data.project:
+    def _get_overwork_hours(self, data):
         shift_duration = timedelta(hours=self.obj.project.shift_duration)
         return math.ceil(
             ((data.end_date - data.start_date - shift_duration).total_seconds() / 3600)
         ) if data.start_date + shift_duration < data.end_date else 0
 
-    def calculate_overwork_sum(self, overtime_hours):
+    def _calculate_overwork_sum(self, overtime_hours):
         return self.obj.project.overtime_rate * overtime_hours
 
-    def calculate_current_lunch_sum(self, data):
+    def _calculate_current_lunch_sum(self, data):
         return (
             self.obj.project.current_lunch_rate
             if data.is_current_lunch
             else 0
         )
 
-    def calculate_late_lunch_sum(self, data):
+    def _calculate_late_lunch_sum(self, data):
         return (
             self.obj.project.late_lunch_rate
             if data.is_late_lunch
             else 0
         )
 
-    def calculate_per_diem_sum(self, data):
+    def _calculate_per_diem_sum(self, data):
         return self.obj.project.per_diem if data.is_per_diem else 0
 
-    def get_non_rest_hours(self, data, rest_hours):
+    def _get_non_rest_hours(self, data, rest_hours):
         previous_shift = Shift.objects.filter(
             project=self.obj.project, end_date__lt=data.start_date
         ).order_by('-end_date').first()
@@ -120,27 +124,27 @@ class ShiftManager:
             return non_sleep_hours
         return 0
 
-    def get_non_sleep_hours(self, data):
+    def _get_non_sleep_hours(self, data):
         if not data.is_day_off:
-            non_sleep_hours = self.get_non_rest_hours(
+            non_sleep_hours = self._get_non_rest_hours(
                 data, self.obj.project.rest_duration
             )
             return non_sleep_hours
         return 0
 
-    def calculate_non_sleep_sum(self, non_sleep_hours):
+    def _calculate_non_sleep_sum(self, non_sleep_hours):
         return non_sleep_hours * self.obj.project.non_sleep_rate
 
     def get_day_off_hours(self, data):
         if data.is_day_off:
-            day_off_hours = self.get_non_rest_hours(data, DAY_OFF_HOURS)
+            day_off_hours = self._get_non_rest_hours(data, DAY_OFF_HOURS)
             return day_off_hours
         return 0
 
-    def calculate_day_off_sum(self, day_off_hours):
+    def _calculate_day_off_sum(self, day_off_hours):
         return self.obj.project.day_off_rate * day_off_hours
 
-    def calculate_total(
+    def _calculate_total(
             self, shift_sum, overwork_sum, current_lunch_sum,
             late_lunch_sum, per_diem_sum, day_off_sum, non_sleep_sum,
             services_sum

@@ -2,6 +2,8 @@ from datetime import datetime
 from django.utils import timezone
 from rest_framework import serializers
 
+from users.models import TelegramUser
+
 
 def validate_dates(start_date, end_date):
     """
@@ -38,3 +40,11 @@ def validate_dates(start_date, end_date):
         raise serializers.ValidationError(errors)
 
     return (start_date, end_date)
+
+
+def validate_project_name(name: str, tid: int):
+    user = TelegramUser.objects.get(tid=tid)
+    if user.projects.filter(name=name).exists():
+        raise serializers.ValidationError(
+            {'name': 'Проект с таким названием уже существует.'})
+    return name

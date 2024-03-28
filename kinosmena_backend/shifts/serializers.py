@@ -65,7 +65,8 @@ class ShiftSerializer(serializers.ModelSerializer):
             errors.setdefault('is_current_lunch', []).append(config.lunch.text)
             errors.setdefault('is_late_lunch', []).append(config.lunch.text)
 
-        if services_sum not in config.services.values:
+        if (services_sum not in config.services.values
+                and services_sum is not None):
             errors.setdefault('services_sum', []).append(config.services.text)
 
         if (start_date is not None and
@@ -106,7 +107,7 @@ class ShiftSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        end_date = instance.end_date
+        end_date = validated_data.get('end_date')
 
         if end_date is not None:
             shift_calculator = ShiftManager(instance)

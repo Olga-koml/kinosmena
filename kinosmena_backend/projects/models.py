@@ -114,6 +114,7 @@ class Project(models.Model):
     class Meta:
         verbose_name = 'Проект'
         verbose_name_plural = 'Проекты'
+        unique_together = ['name', 'user']
 
     def __str__(self):
         return self.name
