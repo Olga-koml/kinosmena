@@ -1,6 +1,7 @@
 from django_filters import rest_framework as filters
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import serializers
+from rest_framework.decorators import action
 
 from projects.models import Project
 from shifts.filters import ShiftFilter
@@ -11,6 +12,7 @@ from users.models import TelegramUser
 from shifts.config import load_config
 from api import schemas
 from drf_yasg.utils import swagger_auto_schema
+from shifts.export_reports import get_export_shifts_to_excel
 
 config = load_config()
 
@@ -48,6 +50,13 @@ class ShiftViewSet(ModelViewSet):
             raise serializers.ValidationError({'details': f'{config.active_shift_error}, shift_id: {active_shifts[0].id}'})
         serializer.validated_data['user'] = user
         serializer.save()
+
+    @action(
+        detail=False,
+        # permission_classes=[IsAuthenticated]
+    )
+    def export_shifts_to_excel(self, request):
+        return get_export_shifts_to_excel(request)
 
     @swagger_auto_schema(
         manual_parameters=schemas.shifts_filter_params
