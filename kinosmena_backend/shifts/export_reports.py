@@ -73,7 +73,7 @@ from openpyxl.utils import get_column_letter
 def get_export_shifts_to_excel(request):
     tid = request.GET.get('tid')
     user = TelegramUser.objects.get(tid=tid)
-    shifts = Shift.objects.filter(user=user)
+    shifts = Shift.objects.filter(user=user).order_by('start_date')
 
     for shift in shifts:
         shift.start_date = shift.start_date.astimezone(pytz.utc).replace(tzinfo=None)
