@@ -1,8 +1,7 @@
 from rest_framework import serializers
 
+from api.validators import validate_dates, validate_project_name
 from projects.models import Project
-
-from api.validators import validate_dates
 from shifts.serializers import ShiftShortSerializer
 
 
@@ -38,6 +37,9 @@ class ProjectSerializer(serializers.ModelSerializer):
         end_date = data.get('end_date')
         # if start_date is not None and end_date is not None:
         validate_dates(start_date, end_date)
+        tid = self.context['request'].query_params.get('tid')
+        validate_project_name(name=data.get('name'),
+                              tid=tid)
         return data
 
     def create(self, validated_data):

@@ -13,6 +13,7 @@ class ServiceField:
 class DateField:
     text = 'Некорректная дата.'
     text_2 = 'Дата окончания не может быть раньше даты начала.'
+    text_3 = 'Смена в этот период уже существует.'
     min_value = datetime(2000, 1, 1, tzinfo=timezone.get_current_timezone())
     max_value = datetime(2099, 1, 1, tzinfo=timezone.get_current_timezone())
 
