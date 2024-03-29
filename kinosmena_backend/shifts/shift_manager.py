@@ -61,7 +61,6 @@ class ShiftManager:
 
         self.obj.save()
 
-
     def _calculate_shift_sum(self):
         return self.obj.project.shift_rate
 
@@ -106,11 +105,12 @@ class ShiftManager:
             prev_fact_shift_duration = math.ceil(
                 (prev_shift_end_date - prev_shift_start_date
                  ).total_seconds() / 3600)
-            shift_duration = timedelta(hours=self.obj.project.shift_duration)
+            # убираю так как расчет недосыпа от фактически законченной смены, округленной
+            # shift_duration = timedelta(hours=self.obj.project.shift_duration)
             prev_date_start_non_sleep = (
                 prev_shift_start_date + timedelta(hours=prev_fact_shift_duration)
-                if prev_fact_shift_duration > self.obj.project.shift_duration
-                else prev_shift_start_date + shift_duration
+                # if prev_fact_shift_duration > self.obj.project.shift_duration
+                # else prev_shift_start_date + shift_duration
             )
             print(prev_date_start_non_sleep, "DATE_START_NON_SLEEP")
             rest_duration = timedelta(hours=rest_hours)
