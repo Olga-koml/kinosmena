@@ -43,7 +43,7 @@ class Shift(models.Model):
         verbose_name='смена в day-off',
         default=False
     )
-    services_sum = models.IntegerField(
+    services_sum = models.PositiveSmallIntegerField(
         verbose_name='Дополнительные услуги',
         default=0
     )

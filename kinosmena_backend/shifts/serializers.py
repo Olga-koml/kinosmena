@@ -86,14 +86,34 @@ class ShiftSerializer(serializers.ModelSerializer):
                 and end_date is not None and not (start_date < end_date)):
             errors.setdefault('end_date', []).append(config.datefield.text_2)
 
-        existing_shifts = user.shifts.filter(start_date__lte=end_date,
-                                             end_date__gte=start_date,
-                                             project=data.get('project'))
-        if existing_shifts.exists() and (
-                start_date <= existing_shifts.first().start_date or end_date >= existing_shifts.last().end_date):
-            errors.setdefault('date_interval_error', []).append(
-                config.datefield.text_3
+        if start_date:
+            existing_shifts = user.shifts.filter(
+                start_date__lte=start_date,
+                end_date__gte=start_date,
+                project=data.get('project')
             )
+            if self.instance:
+                existing_shifts.exclude(
+                    id=self.instance.id
+                )
+            if existing_shifts.exists():
+                errors.setdefault('start_date', []).append(
+                    config.datefield.text_3
+                )
+
+        if end_date:
+            existing_shifts = user.shifts.filter(
+                start_date__lte=end_date,
+                end_date__gte=end_date,
+                project=data.get('project'))
+            if self.instance:
+                existing_shifts.exclude(
+                    id=self.instance.id
+                )
+            if existing_shifts.exists():
+                errors.setdefault('end_date', []).append(
+                    config.datefield.text_3
+                )
 
         if errors:
             raise serializers.ValidationError(errors)
