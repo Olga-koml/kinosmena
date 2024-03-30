@@ -70,11 +70,12 @@ from openpyxl.styles import Alignment, PatternFill
 from openpyxl.utils import get_column_letter
 
 
-def get_export_shifts_to_excel(request):
-    tid = request.GET.get('tid')
-    user = TelegramUser.objects.get(tid=tid)
-    shifts = Shift.objects.filter(user=user).order_by('start_date')
-
+def get_export_shifts_to_excel(queryset):
+    # tid = request.GET.get('tid')
+    # user = TelegramUser.objects.get(tid=tid)
+    # shifts = Shift.objects.filter(user=user).order_by('start_date')
+    shifts = queryset.order_by('start_date')
+    
     for shift in shifts:
         shift.start_date = shift.start_date.astimezone(pytz.utc).replace(tzinfo=None)
         shift.end_date = shift.end_date.astimezone(pytz.utc).replace(tzinfo=None)
@@ -92,26 +93,29 @@ def get_export_shifts_to_excel(request):
     ws.append([
         'Номер',
         'Название проекта',
+        'Кол-во смен',
         'Начало смены',
         'Окончание смены',
         'Стоимость смены',
-        'Сумма переработок',
-        #  Shift._meta.get_field('overwork_sum').verbose_name,
+        'Cтоимость переработки в час',
         Shift._meta.get_field('overwork_hours').verbose_name,
-        Shift._meta.get_field('non_sleep_sum').verbose_name,
+        Shift._meta.get_field('overwork_sum').verbose_name,
+        'Стоимость недосыпа в час',
         Shift._meta.get_field('non_sleep_hours').verbose_name,
-        Shift._meta.get_field('day_off_sum').verbose_name,
+        Shift._meta.get_field('non_sleep_sum').verbose_name,
+        'Cтоимость day_off в час',
+        Shift._meta.get_field('is_day_off').verbose_name + ', 1 - да, 0 - нет',
         Shift._meta.get_field('day_off_hours').verbose_name,
-        Shift._meta.get_field('is_day_off').verbose_name,
+        Shift._meta.get_field('day_off_sum').verbose_name,
+        Shift._meta.get_field('is_current_lunch').verbose_name + ', 1 - да, 0 - нет',
         Shift._meta.get_field('current_lunch_sum').verbose_name,
-        Shift._meta.get_field('is_current_lunch').verbose_name,
+        Shift._meta.get_field('is_late_lunch').verbose_name + ', 1 - да, 0 - нет',
         Shift._meta.get_field('late_lunch_sum').verbose_name,
-        Shift._meta.get_field('is_late_lunch').verbose_name,
+        Shift._meta.get_field('is_per_diem').verbose_name + ', 1 - да, 0 - нет',
         Shift._meta.get_field('per_diem_sum').verbose_name,
-        Shift._meta.get_field('is_per_diem').verbose_name,
         Shift._meta.get_field('services_sum').verbose_name,
         Shift._meta.get_field('total').verbose_name,
-        'Сумма с учетом 6%'
+        # 'Сумма с учетом 6%'
     ])
 
     # Устанавливаем стили для заголовков
@@ -131,37 +135,41 @@ def get_export_shifts_to_excel(request):
         ws.append([
             idx,
             shift.project.name,
+            1,
             shift.start_date.strftime('%d.%m.%Y %H:%M'),
             shift.end_date.strftime('%d.%m.%Y %H:%M'),
             shift.shift_sum,
-            shift.overwork_sum,
+            shift.project.overtime_rate,
             shift.overwork_hours,
-            shift.non_sleep_sum,
+            shift.overwork_sum,
+            shift.project.non_sleep_rate,
             shift.non_sleep_hours,
-            shift.day_off_sum,
-            shift.day_off_hours,
+            shift.non_sleep_sum,
+            shift.project.day_off_rate,
             1 if shift.is_day_off else 0,
-            shift.current_lunch_sum,
+            shift.day_off_hours,
+            shift.day_off_sum,
             1 if shift.is_current_lunch else 0,
-            shift.late_lunch_sum,
+            shift.current_lunch_sum,
             1 if shift.is_late_lunch else 0,
-            shift.per_diem_sum,
+            shift.late_lunch_sum,
             1 if shift.is_per_diem else 0,
+            shift.per_diem_sum,
             shift.services_sum,
             shift.total,
-            shift.total*1.06
+            # shift.total*1.06
         ])
 
     # Итоговая строка считается через ексель
     current_max_row = ws.max_row
-    for col in range(3, 22):
+    for col in range(3, ws.max_column+1):
         col_letter = get_column_letter(col)
         sum_formula = f'=SUM({col_letter}5:{col_letter}{current_max_row})'
         ws[f'{col_letter}{current_max_row + 1}'] = sum_formula
 
     ws[f'B{current_max_row + 1}'] = 'ИТОГО'
     # Устанавливаем стили для ячеек с данными
-    for row in ws.iter_rows(min_row=4, max_row=ws.max_row, min_col=1, max_col=21):
+    for row in ws.iter_rows(min_row=4, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
         for cell in row:
             cell.alignment = cell.alignment.copy(wrapText=True, vertical='center')
             cell.border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
@@ -172,6 +180,7 @@ def get_export_shifts_to_excel(request):
 
     # делаем ширину первого столбца поменьше
     ws.column_dimensions['A'].width = 8
+    ws.column_dimensions['C'].width = 8
 
     for row in ws.iter_rows(min_row=ws.max_row, max_row=ws.max_row):
         for cell in row:
@@ -183,7 +192,10 @@ def get_export_shifts_to_excel(request):
     wb.save(output)
     output.seek(0)
 
-    response = HttpResponse(output.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response = HttpResponse(
+        output.read(),
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
     response['Content-Disposition'] = 'attachment; filename=shifts.xlsx'
 
     return response

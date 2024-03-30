@@ -56,7 +56,7 @@ class ShiftViewSet(ModelViewSet):
         # permission_classes=[IsAuthenticated]
     )
     def export_shifts_to_excel(self, request):
-        return get_export_shifts_to_excel(request)
+        return get_export_shifts_to_excel(self.get_queryset())
 
     @swagger_auto_schema(
         manual_parameters=schemas.shifts_filter_params
