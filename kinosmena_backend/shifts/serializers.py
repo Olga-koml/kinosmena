@@ -93,7 +93,7 @@ class ShiftSerializer(serializers.ModelSerializer):
                 project=data.get('project')
             )
             if self.instance:
-                existing_shifts.exclude(
+                existing_shifts = existing_shifts.exclude(
                     id=self.instance.id
                 )
             if existing_shifts.exists():
@@ -107,7 +107,7 @@ class ShiftSerializer(serializers.ModelSerializer):
                 end_date__gte=end_date,
                 project=data.get('project'))
             if self.instance:
-                existing_shifts.exclude(
+                existing_shifts = existing_shifts.exclude(
                     id=self.instance.id
                 )
             if existing_shifts.exists():
