@@ -68,6 +68,66 @@ from io import BytesIO
 import pytz
 from openpyxl.styles import Alignment, PatternFill
 from openpyxl.utils import get_column_letter
+from django.conf import settings
+from bot import send_message_async, send_telegram_message
+from asgiref.sync import async_to_sync
+import math
+
+
+def get_format_date(date):
+    """Преобразует дату в формат ДД.MM.ГГГГ Ч:М."""
+    return date.astimezone(pytz.utc).replace(tzinfo=None).strftime('%d.%m.%Y %H:%M')
+
+
+def get_export_shifts_to_text_report(object):
+    message = ''
+    total_hours = 0
+  
+    tid = object.user
+
+    # start_date = object.start_date.astimezone(pytz.utc).replace(tzinfo=None).strftime('%d.%m.%Y %H:%M')
+    # end_date = object.end_date.astimezone(pytz.utc).replace(tzinfo=None).strftime('%d.%m.%Y %H:%M')
+    start_date = get_format_date(object.start_date)
+    end_date = get_format_date(object.end_date)
+    fact_shift_duration = math.ceil(
+            ((object.end_date - object.start_date).total_seconds() / 3600)
+        )
+    message += (
+        f'Проект: {object.project.name}\n'
+        f'Начало смены: {start_date}\n'
+        f'Конец смены: {end_date}\n'
+        f'Фактическая продолжительность смены: {fact_shift_duration} ч\n'
+    )
+    if object.overwork_hours > 0:
+        message += f'Переработки: {object.overwork_hours} ч\n'
+        total_hours += object.overwork_hours
+    if object.non_sleep_hours > 0:
+        message += f'Недосып: {object.non_sleep_hours} ч\n'
+        total_hours += object.non_sleep_hours
+    if object.day_off_hours > 0:
+        message += f'Day_off: {object.day_off_hours} ч\n'
+        total_hours += object.day_off_hours
+    if object.is_current_lunch:
+        message += 'Текущий обед: 1 ч\n'
+        total_hours += 1
+    if object.is_late_lunch:
+        message += 'Поздний обед: 1 ч\n'
+        total_hours += 1
+    if object.is_per_diem:
+        message += 'Суточные: да\n'
+    if total_hours > 0:
+        message += f'Итого сверх плановой смены: {total_hours} ч'
+    print(message)
+    # async_send_message = async_to_sync(send_message_async)  # Оборачиваем асинхронную функцию в синхронную
+    # async_send_message(message=message, telegram_id=tid)
+    send_telegram_message(chat_id=tid, message=message)
+    # await send_message_async(message=message, telegram_id=tid)
+    response = HttpResponse(
+        message,
+        content_type='text/plain'
+        # content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    return response
 
 
 def get_export_shifts_to_excel(queryset):
@@ -77,8 +137,10 @@ def get_export_shifts_to_excel(queryset):
     shifts = queryset.order_by('start_date')
     
     for shift in shifts:
-        shift.start_date = shift.start_date.astimezone(pytz.utc).replace(tzinfo=None)
-        shift.end_date = shift.end_date.astimezone(pytz.utc).replace(tzinfo=None)
+        # shift.start_date = shift.start_date.astimezone(pytz.utc).replace(tzinfo=None)
+        # shift.end_date = shift.end_date.astimezone(pytz.utc).replace(tzinfo=None)
+        shift.start_date = get_format_date(shift.start_date)
+        shift.end_date = get_format_date(shift.end_date)
 
     # Создаем новую книгу Excel
     wb = Workbook()
@@ -136,8 +198,10 @@ def get_export_shifts_to_excel(queryset):
             idx,
             shift.project.name,
             1,
-            shift.start_date.strftime('%d.%m.%Y %H:%M'),
-            shift.end_date.strftime('%d.%m.%Y %H:%M'),
+            # shift.start_date.strftime('%d.%m.%Y %H:%M'),
+            # shift.end_date.strftime('%d.%m.%Y %H:%M'),
+            shift.start_date,
+            shift.end_date,
             shift.shift_sum,
             shift.project.overtime_rate,
             shift.overwork_hours,
