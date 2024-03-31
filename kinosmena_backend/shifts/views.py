@@ -12,7 +12,7 @@ from users.models import TelegramUser
 from shifts.config import load_config
 from api import schemas
 from drf_yasg.utils import swagger_auto_schema
-from shifts.export_reports import get_export_shifts_to_excel
+from shifts.export_reports import get_export_shifts_to_excel, get_export_shifts_to_text_report
 
 config = load_config()
 
@@ -57,6 +57,14 @@ class ShiftViewSet(ModelViewSet):
     )
     def export_shifts_to_excel(self, request):
         return get_export_shifts_to_excel(self.get_queryset())
+    
+    @action(
+        detail=True, 
+        # methods=['get',]
+        # permission_classes=[IsAuthenticated]
+    )
+    def export_text_report(self, request, pk=None):
+        return get_export_shifts_to_text_report(self.get_object())
 
     @swagger_auto_schema(
         manual_parameters=schemas.shifts_filter_params

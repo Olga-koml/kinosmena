@@ -11,9 +11,15 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+
+from dotenv import load_dotenv
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv()
 
 
 # Quick-start development settings - unsuitable for production
@@ -193,3 +199,5 @@ MESSAGE_MAX_VALUE_SHIFT_RATE_VALID = f'значение не более {MAX_VAL
 
 # MESSAGE_VALUE_RATE_VALID = f'Допустимое значение стоимости от {MIN_VALUE_RATE} до {MAX_VALUE_RATE}'
 # MESSAGE_VALUE_SHIFT_RATE_VALID = f'Допустимое значение стоимости от {MIN_VALUE_RATE} до {MAX_VALUE_SHIFT_RATE}'
+
+BOT_TOKEN = os.getenv('BOT_TOKEN')
