@@ -107,4 +107,3 @@ class DateValidator:
     def validate_date(cls, value):
         cls.min_date(value)
         cls.max_date(value)
-

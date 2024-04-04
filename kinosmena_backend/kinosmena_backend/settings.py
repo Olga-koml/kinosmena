@@ -38,6 +38,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.127.0.0.1',
     'http://*rbychin.ddns.net/',
     'http://*.127.0.0.1',
+    'https://kinosmena.vercel.app/'
 ]
 # Application definition
 

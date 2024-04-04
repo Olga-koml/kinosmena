@@ -33,6 +33,7 @@ class ShiftManager:
         day_off_hours = self.get_day_off_hours(update_data)
         day_off_sum = self._calculate_day_off_sum(day_off_hours) * coeff
         services_sum = self._calculate_services_sum(update_data) * coeff
+        print('SERVICES_SUM', services_sum)
         total = self._calculate_total(
             shift_sum,
             overwork_sum,
@@ -41,7 +42,7 @@ class ShiftManager:
             per_diem_sum,
             day_off_sum,
             non_sleep_sum,
-            services_sum
+            services_sum,
         )
 
         # Обновление данных объекта Shift
@@ -55,6 +56,8 @@ class ShiftManager:
         self.obj.non_sleep_sum = non_sleep_sum
         self.obj.day_off_hours = day_off_hours
         self.obj.day_off_sum = day_off_sum
+        self.obj.services_sum = services_sum
+        print('SELF SERVV', self.obj.services_sum)
         self.obj.total = total
 
         self.obj.save()
