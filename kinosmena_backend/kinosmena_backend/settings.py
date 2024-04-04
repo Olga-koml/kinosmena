@@ -76,6 +76,7 @@ CORS_ALLOWED_ORIGINS = [
     # 'http://80.87.109.180:3000',
     'http://rbychin.ddns.net:6080',
     'https://rbychin.ddns.net:6080',
+    'https://kinosmena.vercel.app',
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
