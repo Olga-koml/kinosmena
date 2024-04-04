@@ -57,9 +57,9 @@ class ShiftViewSet(ModelViewSet):
     )
     def export_shifts_to_excel(self, request):
         return get_export_shifts_to_excel(self.get_queryset())
-    
+
     @action(
-        detail=True, 
+        detail=True,
         # methods=['get',]
         # permission_classes=[IsAuthenticated]
     )

@@ -24,7 +24,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             'current_lunch_rate',
             'late_lunch_rate',
             'per_diem',
-            'day_off_rate',
+            # 'day_off_rate', # убрали
+            # 'day_off_coefficient', # скрыто
             'is_archive',
             'created',
             'user',

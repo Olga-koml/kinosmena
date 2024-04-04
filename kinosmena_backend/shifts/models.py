@@ -1,4 +1,3 @@
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.timezone import now
 
@@ -43,6 +42,12 @@ class Shift(models.Model):
         verbose_name='смена в day-off',
         default=False
     )
+
+    is_coefficient_shift = models.BooleanField(
+        verbose_name='Коэффициент day-off х вся смена',
+        default=False
+    )
+
     services_sum = models.PositiveSmallIntegerField(
         verbose_name='Дополнительные услуги',
         default=0

@@ -3,8 +3,8 @@ from django.conf import settings
 # from django.contrib.auth import get_user_model
 
 from users.models import TelegramUser
-from .validators import HoursValidator, RateValidator, TextValidator
-
+from .validators import DateValidator, HoursValidator, RateValidator, TextValidator
+from django.core.validators import MinValueValidator
 # User = get_user_model()
 
 
@@ -32,6 +32,7 @@ class Project(models.Model):
         null=True,
         blank=True,
         verbose_name='Дата начала проекта',
+        validators=[DateValidator.validate_date],
     )
 
     end_date = models.DateTimeField(
@@ -94,11 +95,20 @@ class Project(models.Model):
         validators=[RateValidator.validate_rate]
     )
 
-    day_off_rate = models.IntegerField(
-        verbose_name='Стоимость Day-off',
-        blank=True,
-        null=True,
-        validators=[RateValidator.validate_rate]
+    # убрали 03.04.2024
+    # day_off_rate = models.IntegerField(
+    #     verbose_name='Стоимость Day-off',
+    #     blank=True,
+    #     null=True,
+    #     validators=[RateValidator.validate_rate]
+    # )
+
+    day_off_coefficient = models.DecimalField(
+        max_digits=3,
+        decimal_places=1,
+        verbose_name='Коэффицент day-off',
+        default=2,
+        validators=[MinValueValidator(1)]
     )
 
     created = models.DateTimeField(
@@ -142,7 +152,7 @@ class Project(models.Model):
             'non_sleep_rate',
             'late_lunch_rate',
             'per_diem',
-            'day_off_rate'
+            # 'day_off_rate'
         ]
         for attr_name in attributes_to_check:
             attr_value = getattr(self, attr_name)

@@ -81,7 +81,7 @@ def get_format_date(date):
 
 def get_export_shifts_to_text_report(object):
     message = ''
-    total_hours = 0
+    # total_hours = 0
   
     tid = object.user
 
@@ -94,29 +94,29 @@ def get_export_shifts_to_text_report(object):
         )
     message += (
         f'Проект: {object.project.name}\n'
-        f'Начало смены: {start_date}\n'
-        f'Конец смены: {end_date}\n'
-        f'Фактическая продолжительность смены: {fact_shift_duration} ч\n'
+        f'Начало: {start_date}\n'
+        f'Конец: {end_date}\n'
+        f'Смена: {fact_shift_duration} ч\n'
     )
     if object.overwork_hours > 0:
         message += f'Переработки: {object.overwork_hours} ч\n'
-        total_hours += object.overwork_hours
+        # total_hours += object.overwork_hours
     if object.non_sleep_hours > 0:
         message += f'Недосып: {object.non_sleep_hours} ч\n'
-        total_hours += object.non_sleep_hours
+        # total_hours += object.non_sleep_hours
     if object.day_off_hours > 0:
         message += f'Day_off: {object.day_off_hours} ч\n'
-        total_hours += object.day_off_hours
+        # total_hours += object.day_off_hours
     if object.is_current_lunch:
-        message += 'Текущий обед: 1 ч\n'
-        total_hours += 1
+        message += 'Текущий обед: 1\n'
+        # total_hours += 1
     if object.is_late_lunch:
-        message += 'Поздний обед: 1 ч\n'
-        total_hours += 1
+        message += 'Поздний обед: 1\n'
+        # total_hours += 1
     if object.is_per_diem:
         message += 'Суточные: да\n'
-    if total_hours > 0:
-        message += f'Итого сверх плановой смены: {total_hours} ч'
+    # if total_hours > 0:
+    #     message += f'Итого сверх плановой смены: {total_hours} ч'
     print(message)
     # async_send_message = async_to_sync(send_message_async)  # Оборачиваем асинхронную функцию в синхронную
     # async_send_message(message=message, telegram_id=tid)
@@ -165,7 +165,7 @@ def get_export_shifts_to_excel(queryset):
         'Стоимость недосыпа в час',
         Shift._meta.get_field('non_sleep_hours').verbose_name,
         Shift._meta.get_field('non_sleep_sum').verbose_name,
-        'Cтоимость day_off в час',
+        # 'Cтоимость day_off в час',
         Shift._meta.get_field('is_day_off').verbose_name + ', 1 - да, 0 - нет',
         Shift._meta.get_field('day_off_hours').verbose_name,
         Shift._meta.get_field('day_off_sum').verbose_name,
@@ -209,7 +209,7 @@ def get_export_shifts_to_excel(queryset):
             shift.project.non_sleep_rate,
             shift.non_sleep_hours,
             shift.non_sleep_sum,
-            shift.project.day_off_rate,
+            # shift.project.day_off_rate,
             1 if shift.is_day_off else 0,
             shift.day_off_hours,
             shift.day_off_sum,

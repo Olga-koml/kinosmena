@@ -6,7 +6,6 @@ from shifts.config import load_config
 from datetime import timedelta
 
 from shifts.models import Shift
-import math
 from shifts.shift_manager import ShiftManager
 from users.models import TelegramUser
 
@@ -34,6 +33,7 @@ class ShiftSerializer(serializers.ModelSerializer):
             'is_per_diem',
             'per_diem_sum',
             'is_day_off',
+            'is_coefficient_shift',
             'day_off_sum',
             'day_off_hours',
             'services_sum',
@@ -146,6 +146,7 @@ class ShiftSerializer(serializers.ModelSerializer):
             shift_calculator = ShiftManager(instance)
             shift_calculator.update(validated_data)
 
+        validated_data['services_sum'] = instance.services_sum
         return super().update(instance, validated_data)
 
 
