@@ -34,6 +34,7 @@ class ShiftSerializer(serializers.ModelSerializer):
             'is_per_diem',
             'per_diem_sum',
             'is_day_off',
+            'is_coefficient_shift',
             'day_off_sum',
             'day_off_hours',
             'services_sum',

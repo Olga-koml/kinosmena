@@ -6,6 +6,7 @@ from django.core.validators import (
 )
 
 from django.conf import settings
+from django.utils import timezone
 
 
 class TextValidator:
@@ -14,7 +15,7 @@ class TextValidator:
     """
 
     text_regex = RegexValidator(
-        regex=r'[а-яА-Яa-zA-Z0-9_ .]+',
+        regex=r'^[а-яА-ЯёЁa-zA-Z0-9_ .]+$',
         message=settings.MESSAGE_TEXT_REGEX_VALID
     )
     name_max_length = MaxLengthValidator(
@@ -90,3 +91,20 @@ class RateValidator:
     def validate_shift_rate(cls, value):
         cls.rate_min_value(value)
         cls.shift_rate_max_value(value)
+
+
+class DateValidator:
+    min_date = MinValueValidator(
+        timezone.make_aware(timezone.datetime(2000, 1, 1)),
+        'Некорректная дата'
+    )
+    max_date = MaxValueValidator(
+        timezone.make_aware(timezone.datetime(2099, 1, 1)),
+        'Некорректная дата'
+    )
+
+    @classmethod
+    def validate_date(cls, value):
+        cls.min_date(value)
+        cls.max_date(value)
+

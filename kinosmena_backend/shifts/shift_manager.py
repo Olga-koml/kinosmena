@@ -3,8 +3,6 @@ from datetime import timedelta
 
 from shifts.models import Shift
 
-DAY_OFF_HOURS = 36
-
 
 class UpdateData:
     def __init__(self, obj, **kwargs):
@@ -23,18 +21,18 @@ class ShiftManager:
     def update(self, data: dict):
         update_data: UpdateData = UpdateData(self.obj, **data)
         print(self._get_overwork_hours(update_data))
-
-        shift_sum = self._calculate_shift_sum()
+        coeff = self._get_coefficient_shift(update_data)  # коэффицент x 2
+        shift_sum = self._calculate_shift_sum() * coeff
         overwork_hours = self._get_overwork_hours(update_data)
-        overwork_sum = self._calculate_overwork_sum(overwork_hours)
-        current_lunch_sum = self._calculate_current_lunch_sum(update_data)
-        late_lunch_sum = self._calculate_late_lunch_sum(update_data)
-        per_diem_sum = self._calculate_per_diem_sum(update_data)
+        overwork_sum = self._calculate_overwork_sum(overwork_hours) * coeff
+        current_lunch_sum = self._calculate_current_lunch_sum(update_data) * coeff
+        late_lunch_sum = self._calculate_late_lunch_sum(update_data) * coeff
+        per_diem_sum = self._calculate_per_diem_sum(update_data) * coeff
         non_sleep_hours = self._get_non_sleep_hours(update_data)
-        non_sleep_sum = self._calculate_non_sleep_sum(non_sleep_hours)
+        non_sleep_sum = self._calculate_non_sleep_sum(non_sleep_hours) * coeff
         day_off_hours = self.get_day_off_hours(update_data)
-        day_off_sum = self._calculate_day_off_sum(day_off_hours)
-        services_sum = self._calculate_services_sum(update_data)
+        day_off_sum = self._calculate_day_off_sum(day_off_hours) * coeff
+        services_sum = self._calculate_services_sum(update_data) * coeff
         total = self._calculate_total(
             shift_sum,
             overwork_sum,
@@ -60,6 +58,13 @@ class ShiftManager:
         self.obj.total = total
 
         self.obj.save()
+
+    def _get_coefficient_shift(self, data):
+        return (
+            self.obj.project.day_off_coefficient
+            if data.is_coefficient_shift
+            else 1
+        )
 
     def _calculate_shift_sum(self):
         return self.obj.project.shift_rate
@@ -125,7 +130,7 @@ class ShiftManager:
         return 0
 
     def _get_non_sleep_hours(self, data):
-        if not data.is_day_off:
+        if not data.is_day_off or (data.is_day_off and data.is_coefficient_shift):
             non_sleep_hours = self._get_non_rest_hours(
                 data, self.obj.project.rest_duration
             )
@@ -136,13 +141,15 @@ class ShiftManager:
         return non_sleep_hours * self.obj.project.non_sleep_rate
 
     def get_day_off_hours(self, data):
-        if data.is_day_off:
-            day_off_hours = self._get_non_rest_hours(data, DAY_OFF_HOURS)
+        if data.is_day_off and not data.is_coefficient_shift:
+            day_off_hours = self._get_non_rest_hours(
+                data, self.obj.project.rest_duration + 24)
             return day_off_hours
         return 0
 
     def _calculate_day_off_sum(self, day_off_hours):
-        return self.obj.project.day_off_rate * day_off_hours
+        # return self.obj.project.day_off_rate * day_off_hours
+        return self.obj.project.non_sleep_rate * day_off_hours
 
     def _calculate_total(
             self, shift_sum, overwork_sum, current_lunch_sum,
