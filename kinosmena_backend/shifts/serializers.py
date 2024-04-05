@@ -58,15 +58,15 @@ class ShiftSerializer(serializers.ModelSerializer):
         errors = {}
         tid = self.context['request'].query_params.get('tid')
         user = TelegramUser.objects.get(tid=tid)
-        is_current_lunch = data.get('is_current_lunch')
-        is_late_lunch = data.get('is_late_lunch')
+        # is_current_lunch = data.get('is_current_lunch')
+        # is_late_lunch = data.get('is_late_lunch')
         services_sum = data.get('services_sum')
         start_date = data.get('start_date')
         end_date = data.get('end_date')
 
-        if is_current_lunch and is_late_lunch:
-            errors.setdefault('is_current_lunch', []).append(config.lunch.text)
-            errors.setdefault('is_late_lunch', []).append(config.lunch.text)
+        # if is_current_lunch and is_late_lunch:
+        #     errors.setdefault('is_current_lunch', []).append(config.lunch.text)
+        #     errors.setdefault('is_late_lunch', []).append(config.lunch.text)
 
         if (services_sum not in config.services.values
                 and services_sum is not None):
