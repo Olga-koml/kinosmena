@@ -33,6 +33,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+FORCE_SCRIPT_NAME = '/kinosmena'
+
 CSRF_TRUSTED_ORIGINS = [
     'https://*rbychin.ddns.net/',
     'https://*.127.0.0.1',
@@ -76,6 +78,7 @@ CORS_ALLOWED_ORIGINS = [
     # 'http://80.87.109.180:3000',
     'http://rbychin.ddns.net:6080',
     'https://rbychin.ddns.net:6080',
+    'https://rbychin.ddns.net',
     'https://kinosmena.vercel.app',
 ]
 
