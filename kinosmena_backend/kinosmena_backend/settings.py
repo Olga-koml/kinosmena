@@ -173,8 +173,8 @@ REST_FRAMEWORK = {
 }
 
 # SESSION_COOKIE_SECURE = True
-# CORS_ALLOW_ALL_ORIGINS = True
-CSRF_TRUSTED_ORIGINS = ['http://*', 'https://*']
+CORS_ALLOW_ALL_ORIGINS = True
+# CSRF_TRUSTED_ORIGINS = ['http://*', 'https://*']
 CORS_ALLOW_HEADERS = default_headers + (
     'Access-Control-Allow-Origin',
     'ngrok-skip-browser-warning',
