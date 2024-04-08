@@ -170,6 +170,9 @@ CORS_ALLOW_METHODS = (
     "POST",
     "PUT",
 )
+CORS_ORIGIN_WHITELIST = (
+   'https://kinosmena.vercel.app',
+)
 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
