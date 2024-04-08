@@ -40,13 +40,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'rest_framework',
     'drf_yasg',
+    'corsheaders',
     'django_filters',
+
     'users.apps.UsersConfig',
     'projects.apps.ProjectsConfig',
     'shifts.apps.ShiftsConfig',
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -62,16 +64,9 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'http://rbychin.ddns.net:6080',
-    'https://rbychin.ddns.net:6080',
-    'https://rbychin.ddns.net',
-    'https://kinosmena.vercel.app',
+    'https://kinosmena.vercel.app/',
 ]
 
-# CORS_ORIGIN_ALLOW_ALL = True
-# CORS_ORIGIN_ALLOW_ALL = os.getenv('DEBUG', 'FALSE').upper() == 'TRUE'
 
 ROOT_URLCONF = 'kinosmena_backend.urls'
 
