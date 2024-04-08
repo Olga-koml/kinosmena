@@ -86,7 +86,8 @@ class RateValidator:
     def validate_rate(cls, value):
         cls.rate_min_value(value)
         cls.rate_max_value(value)
-
+    
+    # в новых ТЗ убрали 9 значное число. Поэтому надо будет убрать, если снова не добавят
     @classmethod
     def validate_shift_rate(cls, value):
         cls.rate_min_value(value)

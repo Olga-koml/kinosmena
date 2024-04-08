@@ -57,7 +57,7 @@ class Project(models.Model):
 
     shift_rate = models.IntegerField(
         verbose_name='Стоимость смены',
-        validators=[RateValidator.validate_shift_rate]
+        validators=[RateValidator.validate_rate]
     )
 
     overtime_rate = models.IntegerField(
