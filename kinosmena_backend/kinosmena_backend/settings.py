@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 
 from dotenv import load_dotenv
+from corsheaders.defaults import default_headers
 
 
 
@@ -174,6 +175,19 @@ REST_FRAMEWORK = {
 # SESSION_COOKIE_SECURE = True
 # CORS_ALLOW_ALL_ORIGINS = True
 CSRF_TRUSTED_ORIGINS = ['http://*', 'https://*']
+CORS_ALLOW_HEADERS = default_headers + (
+    'Access-Control-Allow-Origin',
+    'ngrok-skip-browser-warning',
+    'Access-Control-Allow-Credentials',
+)
+CORS_ALLOW_METHODS = (
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+)
 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
