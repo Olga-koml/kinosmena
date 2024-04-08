@@ -154,7 +154,7 @@ REST_FRAMEWORK = {
 # CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
-    'https://kinosmena.vercel.app/',
+    'https://kinosmena.vercel.app',
 ]
 
 CORS_ALLOW_HEADERS = default_headers + (
