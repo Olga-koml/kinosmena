@@ -36,13 +36,13 @@ ALLOWED_HOSTS = ['*']
 
 FORCE_SCRIPT_NAME = '/kinosmena'
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://*rbychin.ddns.net/',
-    'https://*.127.0.0.1',
-    'http://*rbychin.ddns.net/',
-    'http://*.127.0.0.1',
-    'https://kinosmena.vercel.app/'
-]
+# CSRF_TRUSTED_ORIGINS = [
+#     'https://*rbychin.ddns.net/',
+#     'https://*.127.0.0.1',
+#     'http://*rbychin.ddns.net/',
+#     'http://*.127.0.0.1',
+#     'https://kinosmena.vercel.app/'
+# ]
 # Application definition
 
 INSTALLED_APPS = [
@@ -64,13 +64,13 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'users.middleware.GetOrCreateUser',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 CORS_ALLOWED_ORIGINS = [
