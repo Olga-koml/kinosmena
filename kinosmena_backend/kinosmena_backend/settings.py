@@ -157,7 +157,6 @@ CORS_ALLOW_ALL_ORIGINS = True
 #     'https://kinosmena.vercel.app/',
 # ]
 
-# CSRF_TRUSTED_ORIGINS = ['http://*', 'https://*']
 CORS_ALLOW_HEADERS = default_headers + (
     'Access-Control-Allow-Origin',
     'ngrok-skip-browser-warning',
