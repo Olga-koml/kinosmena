@@ -73,17 +73,16 @@ MIDDLEWARE = [
     'users.middleware.GetOrCreateUser',
 ]
 
-# CORS_ALLOWED_ORIGINS = [
-#     'http://localhost:3000',
-#     'http://localhost:5173',
-#     # 'http://80.87.109.180:3000',
-#     'http://rbychin.ddns.net:6080',
-#     'https://rbychin.ddns.net:6080',
-#     'https://rbychin.ddns.net',
-#     'https://kinosmena.vercel.app',
-# ]
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://rbychin.ddns.net:6080',
+    'https://rbychin.ddns.net:6080',
+    'https://rbychin.ddns.net',
+    'https://kinosmena.vercel.app',
+]
 
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ORIGIN_ALLOW_ALL = os.getenv('DEBUG', 'FALSE').upper() == 'TRUE'
 
 ROOT_URLCONF = 'kinosmena_backend.urls'
