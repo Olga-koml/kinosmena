@@ -151,11 +151,13 @@ REST_FRAMEWORK = {
 }
 
 # SESSION_COOKIE_SECURE = True
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
 
-# CORS_ALLOWED_ORIGINS = [
-#     'https://kinosmena.vercel.app',
-# ]
+CORS_ALLOWED_ORIGINS = [
+    'https://kinosmena.vercel.app',
+    'http://localhost:5173',
+]
+
 
 CORS_ALLOW_HEADERS = default_headers + (
     'Access-Control-Allow-Origin',
@@ -170,9 +172,9 @@ CORS_ALLOW_METHODS = (
     "POST",
     "PUT",
 )
-CORS_ORIGIN_WHITELIST = (
-   'https://kinosmena.vercel.app',
-)
+# CORS_ORIGIN_WHITELIST = (
+#    'https://kinosmena.vercel.app',
+# )
 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
